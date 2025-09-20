@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'active_job' unless defined?(::ActiveJob)
+require 'active_job/uniqueness'
+require 'pry-byebug'
 
 module Readymade
   class BackgroundJob < ::ActiveJob::Base
@@ -12,6 +14,21 @@ module Readymade
       self.arguments[0].dig(:job_options, :queue_as).presence || q || 'default'
     end
     rescue_from StandardError, with: :handle_rescue_from
+
+    class << self
+      def apply_uniqueness!
+        return unless Readymade.config.lock_jobs?
+
+        unique Readymade.config.lock_type,
+               lock_ttl: Readymade.config.lock_ttl,
+               on_conflict: ->(job) { handle_duplication(job) }
+
+      end
+
+      def handle_duplication(job)
+        return job.perform(*job.arguments) unless Readymade.config.locked_queues.include?(job.queue_name.to_sym)
+      end
+    end
 
     def perform(**args)
       args.delete(:class_name).to_s.constantize.send(:call, **args)
@@ -38,5 +55,11 @@ module Readymade
     def job_options
       @job_options ||= self.instance_variable_get('@serialized_arguments')[0]['job_options'] || {}
     end
+  end
+end
+
+if defined?(::ActiveSupport)
+  ActiveSupport.on_load(:after_initialize) do
+    Readymade::BackgroundJob.apply_uniqueness!
   end
 end

@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activemodel"
   spec.add_dependency "activejob"
+  spec.add_dependency 'activejob-uniqueness', '~> 0.4.0'
 end
