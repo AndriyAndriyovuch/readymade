@@ -49,48 +49,57 @@ RSpec.describe Readymade::BackgroundJob do
       end
     end
 
-    context 'when lock_jobs is true' do
-      before do
-        allow(Readymade).to receive(:config).and_return(Readymade::Config.new)
-        Readymade.config.lock_jobs = true
-        Readymade.config.lock_ttl = 3.seconds
-        Readymade::BackgroundJob.apply_uniqueness!
-        ActiveJob::Uniqueness.unlock!
+
+    context 'when queue lock has been applied' do
+      let(:unique_job_class) do
+        Class.new(described_class) do
+          def self.name
+            'TestUniqueBackgroundJob'
+          end
+        end
       end
 
-      it 'creates instance variables from arguments' do
-        allow_any_instance_of(Dummy).to receive(:call_async).with(**args)
+      context 'when lock_jobs is true' do
+        before do
+          allow(Readymade).to receive_message_chain(:config, :lock_jobs?).and_return(true)
+          allow(Readymade).to receive_message_chain(:config, :lock_type).and_return(:until_executed)
+          allow(Readymade).to receive_message_chain(:config, :lock_ttl).and_return(5)
+          allow(Readymade).to receive_message_chain(:config, :locked_queues).and_return([:default])
 
-        res = described_class.perform_later(**args.merge!(class_name: dummy_class.name))
-        res2 = described_class.perform_later(**args.merge!(class_name: dummy_class.name))
+          unique_job_class.apply_uniqueness!
+        end
 
-        expect(res.job_id.size).to eq(36)
-        expect(res.queue_name).to eq('default')
+        it 'creates instance variables from arguments' do
+          allow_any_instance_of(Dummy).to receive(:call_async).with(**args)
 
-        expect(res2).to be_falsey
+          res = unique_job_class.perform_later(**args.merge!(class_name: dummy_class.name))
+          res2 = unique_job_class.perform_later(**args.merge!(class_name: dummy_class.name))
+
+          expect([res, res2].reject(&:!).first.job_id.size).to eq(36)
+          expect([res, res2].reject(&:!).first.queue_name).to eq('default')
+
+          expect([res, res2].select(&:!).first).to be_falsey
+        end
       end
-    end
 
-    context 'when lock_jobs is false' do
-      before do
-        allow(Readymade).to receive(:config).and_return(Readymade::Config.new)
-        Readymade.config.lock_jobs = false
-        Readymade.config.lock_ttl = 3.seconds
-        Readymade::BackgroundJob.apply_uniqueness!
-        ActiveJob::Uniqueness.unlock!
-      end
+      context 'when lock_jobs is false' do
+        before do
+          allow(Readymade).to receive_message_chain(:config, :lock_jobs?).and_return(false)
+          unique_job_class.apply_uniqueness!
+        end
 
-      it 'creates instance variables from arguments' do
-        allow_any_instance_of(Dummy).to receive(:call_async).with(**args)
+        it 'creates instance variables from arguments' do
+          allow_any_instance_of(Dummy).to receive(:call_async).with(**args)
 
-        res3 = described_class.perform_later(**args.merge!(class_name: dummy_class.name))
-        res4 = described_class.perform_later(**args.merge!(class_name: dummy_class.name))
+          res3 = unique_job_class.perform_later(**args.merge!(class_name: dummy_class.name))
+          res4 = unique_job_class.perform_later(**args.merge!(class_name: dummy_class.name))
 
-        expect(res3.job_id.size).to eq(36)
-        expect(res3.queue_name).to eq('default')
+          expect(res3.job_id.size).to eq(36)
+          expect(res3.queue_name).to eq('default')
 
-        expect(res4.job_id.size).to eq(36)
-        expect(res4.queue_name).to eq('default')
+          expect(res4.job_id.size).to eq(36)
+          expect(res4.queue_name).to eq('default')
+        end
       end
     end
   end
