@@ -31,31 +31,32 @@ module Readymade
 
     def initialize
       @lock_jobs = false
-      @lock_type = nil
-      @lock_ttl = nil
+      @lock_type = :until_executed
+      @lock_ttl = 1.days
       @locked_queues = [:default]
     end
 
     def lock_jobs=(bool)
-      # raise ArgumentError, 'Lock jobs must be a boolean' unless bool.is_a?(::Boolean)
+      raise ArgumentError, 'Lock jobs must be a boolean' unless [TrueClass, FalseClass, NilClass].include?(bool.class)
 
       @lock_jobs = bool
     end
 
     def lock_type=(lock_type)
+      raise ArgumentError, 'Lock type must be a symbol' unless lock_type.is_a?(symbol)
       raise ArgumentError, "Lock type must be one of: #{ALLOWED_LOCK_TYPES}" unless ALLOWED_LOCK_TYPES.include?(lock_type)
 
       @lock_type = lock_type
     end
 
     def lock_ttl=(ttl)
-      # raise ArgumentError, 'Lock ttl must be an integer' unless ttl.is_a?(::Integer)
+      raise ArgumentError, 'Lock ttl must be an integer' unless ttl.is_a?(Integer)
 
       @lock_ttl = ttl
     end
 
     def locked_queues=(queues)
-      raise ArgumentError, 'Locked queues must be an array' unless queues.is_a?(::Array)
+      raise ArgumentError, 'Locked queues must be an array' unless queues.is_a?(Array)
 
       @locked_queues = queues
     end

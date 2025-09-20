@@ -17,7 +17,7 @@ module Readymade
 
     class << self
       def apply_uniqueness!
-        return unless Readymade.config.lock_jobs?
+        return unless Readymade.config&.lock_jobs?
 
         unique Readymade.config.lock_type,
                lock_ttl: Readymade.config.lock_ttl,
