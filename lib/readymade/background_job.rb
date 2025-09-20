@@ -2,7 +2,6 @@
 
 require 'active_job' unless defined?(::ActiveJob)
 require 'active_job/uniqueness'
-require 'pry-byebug'
 
 module Readymade
   class BackgroundJob < ::ActiveJob::Base
@@ -22,7 +21,6 @@ module Readymade
         unique Readymade.config.lock_type,
                lock_ttl: Readymade.config.lock_ttl,
                on_conflict: ->(job) { handle_duplication(job) }
-
       end
 
       def handle_duplication(job)

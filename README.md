@@ -35,6 +35,8 @@ Inherit your components from:
 * `Readymade::Action`
 * `Readymade::Operation`
 
+---
+
 ### Readymade::Response
 
 ```ruby
@@ -46,6 +48,8 @@ response.fail? # true
 response.status # 'fail'
 response.data # { errors: { some: 'errors' } }
 ```
+
+---
 
 ### Readymade::Form
 
@@ -100,6 +104,8 @@ end
 = f.text_field :name, required: @form.required?(:name) # false
 ```
 
+---
+
 ### Readymade::InstantForm
 
 Permit params and validates presence inline
@@ -107,6 +113,8 @@ Permit params and validates presence inline
 ```ruby
 Readymade::InstantForm.new(my_params, permitted: %i[name phone], required: %i[email]) # permits: name, phone, email; validates on presence: email
 ```
+
+---
 
 ### Readymade::Action
 
@@ -210,6 +218,53 @@ Orders::Actions::SendNotifications.call_async!(order: order) # job will be faile
 
 ```
 
+
+Here’s a polished version of your README update that makes the setup steps, defaults, and customization options clearer and more user-friendly:
+
+---
+
+### Locking Duplicate Jobs (triggered by `call_async`)
+
+To enable job locking, first generate the initializer:
+
+```bash
+rails generate readymade:install
+```
+
+Then follow the instructions inside the generated file.
+
+
+
+####  Default behavior
+
+* All `call_async` actions run in the `:default` queue.
+* By default, you can configure Readymade to **lock all jobs in `:default`** so that duplicate jobs won’t be enqueued.
+
+
+#### Customizing which jobs are locked
+
+You have two main strategies:
+
+1. **Use `job_options` in your call**
+   If you don’t want a job to be locked, run it in a different queue:
+
+   ```ruby
+   MyAction.call_async(user_id: 42, job_options: { queue_as: :critical })
+   ```
+
+2. **Configure specific queues to lock**
+   In your initializer, define which queues should enforce locking:
+
+   ```ruby
+   Readymade.configure do |config|
+     config.lock_jobs = true
+     config.locked_queues = [:mailers, :anatytics] # only these queues will lock duplicates
+   end
+   ```
+
+---
+
+
 ### Readymade::Operation
 
 Provides set of help methods like: `build_form`, `form_valid?`, `validation_fail`, `save_record`, etc.
@@ -230,6 +285,8 @@ class Orders::Operations::Create < Readymade::Operation
 end
 ```
 
+---
+
 ### Readymade::Controller::Serialization
 
 ```ruby
@@ -243,6 +300,8 @@ Dependencies that must be installed on your own:
 - [blueprinter](https://rubygems.org/gems/blueprinter/)
 - [pagy](https://rubygems.org/gems/pagy)
 - [api-pagination](https://rubygems.org/gems/api-pagination)
+
+---
 
 ### Readymade::Model::ApiAttachable
 
@@ -274,6 +333,8 @@ let(:avatar) { Rack::Test::UploadedFile.new(Rails.root.join('spec/support/assets
 let(:params) { { user: attributes_for(:user).merge!(avatar: to_api_file(avatar)) } }
 ```
 
+---
+
 ### Readymade::Model::Filterable
 
 ```ruby
@@ -289,6 +350,8 @@ end
 User.all.filter_collection({ by_status: 'active', by_role: 'manager' })
 User.all.filter_collection({ by_status: 'active', by_role: 'manager' }, chain_with: :or) # active OR manager
 ```
+
+---
 
 ### Readymade::Model::ValidatableEnum
 
@@ -309,6 +372,8 @@ user = User.new(status: 'archived', role: 'superadmin')
 user.validate # false
 user.errors.full_messages  # ["Role 'superadmin' is not a valid role", "Status 'archived' is not a valid status"]
 ```
+
+---
 
 ## Development
 
