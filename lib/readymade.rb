@@ -43,7 +43,7 @@ module Readymade
     end
 
     def lock_type=(lock_type)
-      raise ArgumentError, 'Lock type must be a symbol' unless lock_type.is_a?(symbol)
+      raise ArgumentError, 'Lock type must be a symbol' unless lock_type.is_a?(Symbol)
       raise ArgumentError, "Lock type must be one of: #{ALLOWED_LOCK_TYPES}" unless ALLOWED_LOCK_TYPES.include?(lock_type)
 
       @lock_type = lock_type
@@ -67,5 +67,3 @@ module Readymade
   end
 end
 
-initializer = './config/initializers/readymade.rb'
-require initializer if File.exist?(initializer)

@@ -6,6 +6,7 @@ This gems contains basic components to follow [ABDI architecture](https://github
 
 ### Tested with ruby:
 
+- 3.3
 - 3.1
 - 3.0
 - 2.7
