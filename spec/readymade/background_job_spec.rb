@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'byebug'
 RSpec.describe Readymade::BackgroundJob do
   class Dummy < Readymade::Action
   end
