@@ -1,14 +1,5 @@
 # frozen_string_literal: true
 
-
-# def initialize
-#   @lock_jobs = false
-#   @lock_type = :until_executed
-#   @lock_ttl = 1.days
-#   @locked_queues = [:default]
-# end
-
-
 RSpec.describe Readymade::Config do
   describe 'configure' do
     context 'with valid values' do
