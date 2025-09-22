@@ -78,7 +78,7 @@ order_form.valid? # true
 class MyForm < Readymade::Form
   PERMITTED_ATTRIBUTES = %i[email name category country]
   REQUIRED_ATTRIBUTES = %i[email]
-  
+
   def form_options
     {
       categories: args[:company].categories,
@@ -220,8 +220,6 @@ Orders::Actions::SendNotifications.call_async!(order: order) # job will be faile
 ```
 
 
-Here’s a polished version of your README update that makes the setup steps, defaults, and customization options clearer and more user-friendly:
-
 ---
 
 ### Locking Duplicate Jobs (triggered by `call_async`)
@@ -341,7 +339,7 @@ let(:params) { { user: attributes_for(:user).merge!(avatar: to_api_file(avatar))
 ```ruby
 class User < ApplicationRecord
   include Readyamde::Model::Filterable
-  
+
   scope :by_status, ->(status) { where(status: status) }
   scope :by_role, ->(role) { where(role: role) }
 end
