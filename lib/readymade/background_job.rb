@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'active_job' unless defined?(::ActiveJob)
-require 'active_job/uniqueness'
 
 module Readymade
   class BackgroundJob < ::ActiveJob::Base
@@ -18,14 +17,36 @@ module Readymade
       def apply_uniqueness!
         return unless Readymade.config&.lock_jobs?
 
-        unique Readymade.config.lock_type,
-               lock_ttl: Readymade.config.lock_ttl,
-               on_conflict: ->(job) { handle_duplication(job) }
+        begin
+          require "active_job/uniqueness"
+
+          unique Readymade.config.lock_type,
+                 lock_ttl: Readymade.config.lock_ttl,
+                 on_conflict: ->(job) { handle_duplication(job) }
+        rescue LoadError
+          warn uniqueness_not_loaded_warning
+        end
       end
 
       def handle_duplication(job)
         return job.perform(*job.arguments) unless Readymade.config.locked_queues.include?(job.queue_name.to_sym)
       end
+
+      def uniqueness_not_loaded_warning
+        <<~MSG
+
+          ======== READYMADE WARNING ========
+
+          The `activejob-uniqueness` gem is not installed, but `lock_jobs` is enabled.
+          Please add the following to your Gemfile:
+
+              gem "activejob-uniqueness", "~> 0.4.0"
+
+          ===================================
+
+        MSG
+      end
+
     end
 
     def perform(**args)

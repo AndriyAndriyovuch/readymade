@@ -230,6 +230,8 @@ To enable job locking, first generate the initializer:
 rails generate readymade:install
 ```
 
+Add `gem 'activejob-uniqueness', '~> 0.4.0'` to your Gemfile. (not included by default to reduce dependencies)
+
 Then follow the instructions inside the generated file.
 
 

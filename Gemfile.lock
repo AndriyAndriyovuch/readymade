@@ -3,7 +3,6 @@ PATH
   specs:
     readymade (0.4.3)
       activejob
-      activejob-uniqueness (~> 0.4.0)
       activemodel
 
 GEM
@@ -45,7 +44,7 @@ GEM
     logger (1.7.0)
     minitest (5.25.5)
     rake (13.0.6)
-    redis-client (0.25.3)
+    redis-client (0.26.0)
       connection_pool
     redlock (2.0.6)
       redis-client (>= 0.14.1, < 1.0.0)
@@ -71,6 +70,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activejob-uniqueness (~> 0.4.0)
   byebug
   rake
   readymade!
