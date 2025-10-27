@@ -29,7 +29,9 @@ module Readymade
       end
 
       def handle_duplication(job)
-        return job.perform(*job.arguments) unless Readymade.config.locked_queues.include?(job.queue_name.to_sym)
+        return if Readymade.config.locked_queues.include?(job.queue_name.to_sym)
+
+        ActiveJob::Uniqueness.unlock!(job_class_name: job.class.name)
       end
 
       def uniqueness_not_loaded_warning
