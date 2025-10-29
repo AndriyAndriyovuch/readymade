@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    readymade (0.4.3)
+    readymade (0.4.4)
       activejob
       activemodel
 
