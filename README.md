@@ -155,7 +155,7 @@ class Orders::Actions::SendNotifications < Readymade::Action
 end
 
 Orders::Actions::SendNotifications.call_async(order: order)
-Orders::Actions::SendNotifications.call_async!(order: order, job_options: { queue_as: :my_queue, discard_on: ActiveJob::DeserializationError})
+Orders::Actions::SendNotifications.call_async!(order: order, job_options: { queue_as: :my_queue })
 ```
 
 ```ruby

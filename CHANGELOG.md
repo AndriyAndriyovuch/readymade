@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 * Add initializer generator
 * Add `ActiveJob::Uniqueness` support
 
+## [0.4.3] - 2025-07-31
+
+* Remove job_options.discard_on` argument to `Readymade::BackgroundJob` to discard job on specific exceptions due to incorrect behaviour on different Rails versions
+
 ## [0.4.2] - 2025-05-26
 
 * Add `job_options.discard_on` argument to `Readymade::BackgroundJob` to discard job on specific exceptions
