@@ -29,6 +29,10 @@ module Readymade
       new(*args, &block).call_async!
     end
 
+    def within_transaction(&)
+      ActiveRecord::Base.transaction(&)
+    end
+
     attr_reader :args, :data
 
     def initialize(args = {})
