@@ -29,8 +29,13 @@ module Readymade
       new(*args, &block).call_async!
     end
 
-    def within_transaction(&)
-      ActiveRecord::Base.transaction(&)
+    def within_transaction(&block)
+      if defined?(ActiveRecord::Base)
+        ActiveRecord::Base.transaction(&block)
+      else
+        warn '[Readymade] ActiveRecord is not available — within_transaction will yield without a transaction'
+        yield
+      end
     end
 
     attr_reader :args, :data
